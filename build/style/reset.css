@@ -1,0 +1,86 @@
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+p,
+blockquote,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+pre,
+figcaption,
+figure,
+fieldset,
+legend,
+button,
+input,
+textarea,
+th,
+td {
+  margin: 0;
+  padding: 0;
+}
+body,
+button,
+input,
+select,
+textarea {
+  font: 14px/1 Lucida Grande, 'Microsoft YaHei', "Lucida Grande", "Lucida Sans Unicode", "Helvetica", "Arial", "Verdana", "sans-serif";
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+}
+ul,
+ol,
+li {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+em,
+i {
+  font-style: normal;
+}
+a,i,em,span,label{
+  display: inline-block;
+}
+input,
+button {
+  border: none;
+  outline: none;
+  background: transparent;
+}
+.sp-between {
+  display: -webkit-flex;
+  justify-content: space-between;
+}
+.al-items {
+  display: -webkit-flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.text-over {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+*{
+  box-sizing: border-box;
+}
