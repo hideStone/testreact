@@ -4,7 +4,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
 	entry: {
-		//  'webpack-dev-server/client?http://localhost:8080',
+		//  'webpack-dev-server/client?http://192.168.11.12:8080',
 		workflowapply: path.resolve(__dirname, 'app/index.js'),
 		workflowdetail: path.resolve(__dirname, 'app/workflowdetail.js')
 	},

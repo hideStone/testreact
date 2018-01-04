@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 39);
+/******/ 	return __webpack_require__(__webpack_require__.s = 41);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -445,6 +445,30 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 var tool = {
+	fetchData: function fetchData(url, data, cb) {
+		var _this = this;
+
+		this.forIos('showLoading', { body: '' });
+		this.forAndroid('showLoading');
+		fetch(url, data).then(function (response) {
+			_this.forIos('dismissLoading', { body: '' });
+			_this.forAndroid('dismissLoading');
+			if (response.ok) {
+				return response.json();
+			}
+		}).then(function (res) {
+			if (res.status > 0) {
+				_this.forIos('submitSuccess', { message: res.message });
+				_this.forAndroid('showToastAndFinish', res.message);
+			} else {
+				_this.forIos('submitFail', { message: res.message });
+				_this.forAndroid('showToast', res.message);
+			}
+		}).catch(function (error) {
+			console.log(error);
+		});
+	},
+
 	/**
   * 处理url
   * @param  {[string]} name [description]
@@ -491,6 +515,68 @@ var tool = {
 			isAnd: isAndroid,
 			isIOS: isiOS
 		};
+	},
+	calc_file_type: function calc_file_type(url) {
+		var splitArr = url.split('.');
+		var type = splitArr[splitArr.length - 1];
+		switch (type) {
+			case 'doc':
+			case 'docx':
+				return 'doc';
+				break;
+			case 'xls':
+				return 'excel';
+				break;
+			case 'pdf':
+				return 'pdf';
+				break;
+			case 'ppt':
+			case 'pptx':
+				return 'ppt';
+				break;
+			case 'txt':
+				return 'txt';
+				break;
+			case 'jpg':
+			case 'JPG':
+			case 'png':
+			case 'PNG':
+				return 'pic';
+				break;
+			default:
+				return 'file';
+				break;
+		}
+	},
+	makeUpData: function makeUpData(data) {
+		var initData = data;
+		var tempObj = {};
+		var _iteratorNormalCompletion = true;
+		var _didIteratorError = false;
+		var _iteratorError = undefined;
+
+		try {
+			for (var _iterator = initData.entries()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+				var entrie = _step.value;
+
+				tempObj[entrie[0]] = entrie[1];
+			}
+		} catch (err) {
+			_didIteratorError = true;
+			_iteratorError = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion && _iterator.return) {
+					_iterator.return();
+				}
+			} finally {
+				if (_didIteratorError) {
+					throw _iteratorError;
+				}
+			}
+		}
+
+		return tempObj;
 	}
 };
 
@@ -1052,10 +1138,8 @@ if (process.env.NODE_ENV === 'production') {
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+    value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(0);
 
@@ -1063,60 +1147,21 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 渲染textarea
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-
-var Textarea = function (_React$Component) {
-	_inherits(Textarea, _React$Component);
-
-	function Textarea(props) {
-		_classCallCheck(this, Textarea);
-
-		var _this = _possibleConstructorReturn(this, (Textarea.__proto__ || Object.getPrototypeOf(Textarea)).call(this, props));
-
-		_this.state = {
-			value: ''
-		};
-		_this.handleChange = _this.handleChange.bind(_this);
-		return _this;
-	}
-
-	_createClass(Textarea, [{
-		key: 'handleChange',
-		value: function handleChange(event) {
-			this.setState({ value: event.target.value });
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var textareaInputInfo = this.props.data;
-			return _react2.default.createElement(
-				'div',
-				{ className: 'wf-line type-texearea' },
-				_react2.default.createElement(
-					'div',
-					{ className: 'form-title' },
-					textareaInputInfo.title
-				),
-				_react2.default.createElement(
-					'div',
-					{ className: 'form-main' },
-					_react2.default.createElement('textarea', { placeholder: '请输入' + textareaInputInfo.title, value: this.state.value, onChange: this.handleChange })
-				)
-			);
-		}
-	}]);
-
-	return Textarea;
-}(_react2.default.Component);
-
-exports.default = Textarea;
+function NoItem(props) {
+    return _react2.default.createElement(
+        "div",
+        { className: "no-item" },
+        _react2.default.createElement("div", null),
+        _react2.default.createElement(
+            "p",
+            null,
+            props.message
+        )
+    );
+} /**
+   * 出错
+   */
+exports.default = NoItem;
 
 /***/ }),
 /* 17 */
@@ -18381,63 +18426,14 @@ isValidElement:K,version:"16.2.0",__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_F
 
 
 /***/ }),
-/* 28 */,
-/* 29 */,
-/* 30 */,
-/* 31 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * 函数定义组件
- * 工作流固定的头部表单 姓名部门
- */
-function Fixed(props) {
-	return _react2.default.createElement(
-		"div",
-		{ className: "wf-line type-fixed" },
-		_react2.default.createElement(
-			"div",
-			{ className: "form-title" },
-			props.title
-		),
-		_react2.default.createElement(
-			"div",
-			{ className: "form-main" },
-			_react2.default.createElement(
-				"span",
-				{ className: "used_show" },
-				props.name
-			)
-		)
-	);
-} /**
-   * 申请工作流固定的组件
-   */
-
-exports.default = Fixed;
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
+    value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -18453,30 +18449,449 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 渲染隐藏域的组件
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 单个按钮组件
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
-var Hidden = function (_React$Component) {
-	_inherits(Hidden, _React$Component);
 
-	function Hidden() {
-		_classCallCheck(this, Hidden);
+var Button = function (_React$Component) {
+    _inherits(Button, _React$Component);
 
-		return _possibleConstructorReturn(this, (Hidden.__proto__ || Object.getPrototypeOf(Hidden)).apply(this, arguments));
-	}
+    function Button(props) {
+        _classCallCheck(this, Button);
 
-	_createClass(Hidden, [{
-		key: "render",
-		value: function render() {
-			var hidenInputInfo = this.props.data;
-			return _react2.default.createElement("input", { name: hidenInputInfo.name, value: hidenInputInfo.value, type: "hidden" });
-		}
-	}]);
+        return _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, props));
+    }
 
-	return Hidden;
+    _createClass(Button, [{
+        key: "render",
+        value: function render() {
+            return _react2.default.createElement(
+                "button",
+                { type: "button",
+                    className: this.props.class_name,
+                    onClick: this.props.onClick },
+                this.props.button_text
+            );
+        }
+    }]);
+
+    return Button;
 }(_react2.default.Component);
 
-exports.default = Hidden;
+exports.default = Button;
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ButtonWrap(props) {
+    return _react2.default.createElement(
+        "div",
+        { className: "btn-area is_fixed_bottom" },
+        _react2.default.createElement(
+            "div",
+            { className: "inner" },
+            props.children
+        )
+    );
+} /**
+   * 底部按钮
+   */
+
+exports.default = ButtonWrap;
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _btnWrap = __webpack_require__(29);
+
+var _btnWrap2 = _interopRequireDefault(_btnWrap);
+
+var _button = __webpack_require__(28);
+
+var _button2 = _interopRequireDefault(_button);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 审批意见
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+function RadioItem(props) {
+    return _react2.default.createElement(
+        'span',
+        null,
+        _react2.default.createElement('input', { type: 'radio', id: props.id, name: props.name, value: props.val, onChange: props.handleChange }),
+        _react2.default.createElement(
+            'label',
+            { htmlFor: props.id },
+            props.text
+        )
+    );
+}
+
+var Approved = function (_React$Component) {
+    _inherits(Approved, _React$Component);
+
+    function Approved(props) {
+        _classCallCheck(this, Approved);
+
+        var _this = _possibleConstructorReturn(this, (Approved.__proto__ || Object.getPrototypeOf(Approved)).call(this, props));
+
+        _this.state = {
+            approve_mark: '',
+            is_back: false
+        };
+        _this.handleChecked = _this.handleChecked.bind(_this);
+        _this.handleChangeText = _this.handleChangeText.bind(_this);
+        return _this;
+    }
+
+    _createClass(Approved, [{
+        key: 'handleChecked',
+        value: function handleChecked(event) {
+            var target = event.target;
+            if (target.id == 3) {
+                this.setState({
+                    is_back: true
+                });
+            } else {
+                this.setState({
+                    is_back: false
+                });
+            }
+        }
+    }, {
+        key: 'handleChangeText',
+        value: function handleChangeText(event) {
+            this.setState({ approve_mark: event.target.value });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                null,
+                _react2.default.createElement(
+                    'div',
+                    { className: 'wf-line type-radio', id: 'approval_type' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-title' },
+                        '\u5BA1\u6279\u610F\u89C1'
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-main' },
+                        _react2.default.createElement(RadioItem, { id: '1', name: 'opinion', val: '1', text: '\u540C\u610F', handleChange: this.handleChecked }),
+                        _react2.default.createElement(RadioItem, { id: '2', name: 'opinion', val: '2', text: '\u4E0D\u540C\u610F', handleChange: this.handleChecked }),
+                        _react2.default.createElement(RadioItem, { id: '3', name: 'opinion', val: '3', text: '\u9000\u56DE', handleChange: this.handleChecked })
+                    )
+                ),
+                this.state.is_back && _react2.default.createElement(
+                    'div',
+                    { className: 'wf-line type-radio' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-title' },
+                        '\u9000\u56DE\u9009\u62E9'
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-main' },
+                        _react2.default.createElement(RadioItem, { id: '4', name: 'level', val: '1', text: '\u9000\u56DE\u7533\u8BF7\u4EBA' }),
+                        !this.props.is_first_task && _react2.default.createElement(RadioItem, { id: '5', name: 'level', val: '2', text: '\u9000\u56DE\u4E0A\u4E00\u7EA7' })
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'wf-line type-texearea', style: { marginTop: "0px" } },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-title' },
+                        '\u5BA1\u6279\u5907\u6CE8'
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-main' },
+                        _react2.default.createElement('textarea', { placeholder: '\u8BF7\u586B\u5199', name: 'mark', value: this.state.approve_mark, onChange: this.handleChangeText })
+                    )
+                ),
+                _react2.default.createElement('input', { type: 'hidden', name: 'currentTaskName', value: this.props.current_task_name }),
+                _react2.default.createElement(
+                    _btnWrap2.default,
+                    null,
+                    _react2.default.createElement(_button2.default, { class_name: 'submit', button_text: '\u63D0\u4EA4', onClick: this.props.handleClick })
+                )
+            );
+        }
+    }]);
+
+    return Approved;
+}(_react2.default.Component);
+
+exports.default = Approved;
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function CurrentTask(props) {
+    return _react2.default.createElement(
+        "div",
+        { className: "current_task" },
+        _react2.default.createElement(
+            "span",
+            { className: "title" },
+            props.isEnd ? '审批结果' : '当前环节'
+        ),
+        _react2.default.createElement(
+            "span",
+            { className: "used_show" },
+            props.currentTaskName
+        )
+    );
+} /**
+   * 当前任务
+   */
+
+exports.default = CurrentTask;
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _tool = __webpack_require__(5);
+
+var _tool2 = _interopRequireDefault(_tool);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 文件选择
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+function FileItem(props) {
+    function fileViewer(event) {
+        // 文件查看器调用app方法
+        var target = event.target;
+        var obj = { url: target.getAttribute('data-url'), fileName: target.getAttribute('data-filename') };
+        _tool2.default.forAndroid('openFile', JSON.stringify(obj));
+        _tool2.default.forIos('showAttachment', obj);
+    }
+    return _react2.default.createElement(
+        'li',
+        null,
+        _react2.default.createElement(
+            'div',
+            null,
+            _react2.default.createElement('img', { src: './style/icon-' + _tool2.default.calc_file_type(props.relativePath) + '.png', height: '44', width: '44' }),
+            _react2.default.createElement(
+                'a',
+                { href: 'javascript:void(0);', className: 'file-name', 'data-filename': props.fileName,
+                    'data-relativepath': props.relativePath, 'data-url': props.url, onClick: fileViewer },
+                props.fileName
+            )
+        ),
+        !props.readOnly && _react2.default.createElement('button', { type: 'buton', className: 'icon-close', 'data-relativepath': props.relativePath, onClick: props.handleCloseFile })
+    );
+}
+
+var SelectFile = function (_React$Component) {
+    _inherits(SelectFile, _React$Component);
+
+    function SelectFile(props) {
+        _classCallCheck(this, SelectFile);
+
+        var _this = _possibleConstructorReturn(this, (SelectFile.__proto__ || Object.getPrototypeOf(SelectFile)).call(this, props));
+
+        _this.state = {
+            fileLists: props.data.value ? JSON.parse(props.data.value) : undefined
+            // FileValue: [],
+        };
+        _this.handleSelectFile = _this.handleSelectFile.bind(_this);
+        _this.handleCloseFile = _this.handleCloseFile.bind(_this);
+        return _this;
+    }
+
+    _createClass(SelectFile, [{
+        key: 'addData',
+        value: function addData(arr) {
+            var tempArr = [];
+            arr.forEach(function (item) {
+                tempArr.push({
+                    file_name: item.fileName,
+                    relative_path: item.relativePath
+                });
+            });
+            return tempArr;
+        }
+    }, {
+        key: 'transformData',
+        value: function transformData(arr) {
+            var temparr = [];
+            arr.forEach(function (item) {
+                temparr.push({
+                    file_name: item.fileName,
+                    relative_path: item.relativePath
+                });
+            });
+            return temparr;
+        }
+    }, {
+        key: 'callback',
+        value: function callback(data) {
+            var _this2 = this;
+
+            var callbackData = JSON.parse(data);
+            this.setState(function (prevState) {
+                return {
+                    fileLists: prevState.fileLists ? [].concat(_toConsumableArray(prevState.fileLists), _toConsumableArray(_this2.transformData(callbackData))) : _this2.transformData(callbackData)
+                    // FileValue: [...prevState.FileValue, ...this.addData(callbackData)]
+                };
+            });
+        }
+    }, {
+        key: 'handleSelectFile',
+        value: function handleSelectFile() {
+            window.getFileLists = this.callback.bind(this);
+            _tool2.default.forIos('addFile', { body: '' });
+            _tool2.default.forAndroid('startSelectFileActivity');
+        }
+    }, {
+        key: 'handleCloseFile',
+        value: function handleCloseFile(event) {
+            var relative_path = event.target.getAttribute('data-relativepath');
+            this.setState(function (prevState) {
+                return {
+                    fileLists: prevState.fileLists.filter(function (item) {
+                        return item.relative_path !== relative_path;
+                    })
+                    // FileValue: prevState.FileValue.filter((item) => {
+                    //     return item.relative_path !== relative_path
+                    // })
+                };
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this3 = this;
+
+            var FileSelectModuleInfo = this.props.data;
+            return _react2.default.createElement(
+                'div',
+                { style: { background: '#fff', marginBottom: '10px' } },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'wf-line type-file-select' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-title' },
+                        '\u9644\u4EF6'
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-main' },
+                        FileSelectModuleInfo.readOnly ? !FileSelectModuleInfo.value && _react2.default.createElement(
+                            'span',
+                            { className: 'un_selected' },
+                            '\u65E0'
+                        ) : _react2.default.createElement(
+                            'button',
+                            { type: 'button', className: 'icon-select-file', onClick: this.handleSelectFile },
+                            _react2.default.createElement('input', { type: 'hidden', id: 'doc_file', name: FileSelectModuleInfo.name, value: JSON.stringify(this.state.fileLists) })
+                        )
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'file-warehouse' },
+                    _react2.default.createElement(
+                        'ul',
+                        null,
+                        this.state.fileLists && this.state.fileLists.map(function (item, index) {
+                            return _react2.default.createElement(FileItem, { readOnly: FileSelectModuleInfo.readOnly,
+                                key: index,
+                                fileName: item.file_name,
+                                relativePath: item.relative_path,
+                                url: _this3.props.file_url + item.relative_path,
+                                handleCloseFile: _this3.handleCloseFile
+                            });
+                        })
+                    )
+                )
+            );
+        }
+    }]);
+
+    return SelectFile;
+}(_react2.default.Component);
+
+exports.default = SelectFile;
 
 /***/ }),
 /* 33 */
@@ -18486,7 +18901,111 @@ exports.default = Hidden;
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function Fixed(props) {
+  return _react2.default.createElement(
+    "div",
+    { className: "wf-line type-fixed" },
+    _react2.default.createElement(
+      "div",
+      { className: "form-title" },
+      props.title
+    ),
+    _react2.default.createElement(
+      "div",
+      { className: "form-main" },
+      _react2.default.createElement(
+        "span",
+        { className: "used_show" },
+        props.text
+      )
+    )
+  );
+} /**
+   * 固定模块顶部
+   */
+
+exports.default = Fixed;
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function FlowApprover(props) {
+  return _react2.default.createElement(
+    "div",
+    { className: "current_spr" },
+    _react2.default.createElement(
+      "span",
+      { className: "title" },
+      "\u5BA1\u6279\u4EBA\u5458"
+    ),
+    _react2.default.createElement(
+      "span",
+      { className: "used_show" },
+      props.flowApprover
+    )
+  );
+} /**
+   * 工作流审批人员
+   */
+
+exports.default = FlowApprover;
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function Hidden(props) {
+    return _react2.default.createElement('input', { type: 'hidden', name: props.data.name, value: props.data.value || '' });
+} /**
+   * 渲染隐藏域表单
+   */
+exports.default = Hidden;
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -18507,301 +19026,56 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 var Normal = function (_React$Component) {
-	_inherits(Normal, _React$Component);
+    _inherits(Normal, _React$Component);
 
-	function Normal(props) {
-		_classCallCheck(this, Normal);
+    function Normal(props) {
+        _classCallCheck(this, Normal);
 
-		var _this = _possibleConstructorReturn(this, (Normal.__proto__ || Object.getPrototypeOf(Normal)).call(this, props));
+        var _this = _possibleConstructorReturn(this, (Normal.__proto__ || Object.getPrototypeOf(Normal)).call(this, props));
 
-		_this.state = {
-			value: ''
-		};
-		_this.handleChange = _this.handleChange.bind(_this);
-		return _this;
-	}
+        _this.state = {
+            value: props.data.value || ''
+        };
+        _this.handleChange = _this.handleChange.bind(_this);
+        return _this;
+    }
 
-	_createClass(Normal, [{
-		key: 'handleChange',
-		value: function handleChange(event) {
-			this.setState({ value: event.target.value });
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var normalInputInfo = this.props.data;
-			return _react2.default.createElement(
-				'div',
-				{ className: 'wf-line type-normal' },
-				_react2.default.createElement(
-					'div',
-					{ className: 'form-title' },
-					normalInputInfo.title
-				),
-				_react2.default.createElement(
-					'div',
-					{ className: 'form-main' },
-					_react2.default.createElement('input', { type: 'text', name: normalInputInfo.name, value: this.state.value, onChange: this.handleChange, placeholder: '请输入' + normalInputInfo.title })
-				)
-			);
-		}
-	}]);
+    _createClass(Normal, [{
+        key: 'handleChange',
+        value: function handleChange(event) {
+            this.setState({ value: event.target.value });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var normalInputInfo = this.props.data;
+            return _react2.default.createElement(
+                'div',
+                { className: 'wf-line type-normal' },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'form-title' },
+                    normalInputInfo.title
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'form-main' },
+                    normalInputInfo.readOnly ? _react2.default.createElement(
+                        'span',
+                        { className: 'user_show' },
+                        normalInputInfo.value
+                    ) : _react2.default.createElement('input', { type: 'text', name: normalInputInfo.name, value: this.state.value, placeholder: '请输入' + normalInputInfo.title, onChange: this.handleChange })
+                )
+            );
+        }
+    }]);
 
-	return Normal;
+    return Normal;
 }(_react2.default.Component);
 
 exports.default = Normal;
 
 /***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _tool = __webpack_require__(5);
-
-var _tool2 = _interopRequireDefault(_tool);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 渲染普通选择
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-
-var Select = function (_React$Component) {
-	_inherits(Select, _React$Component);
-
-	function Select(props) {
-		_classCallCheck(this, Select);
-
-		var _this = _possibleConstructorReturn(this, (Select.__proto__ || Object.getPrototypeOf(Select)).call(this, props));
-
-		_this.state = {
-			select_val: ''
-		};
-		_this.handlerClick = _this.handlerClick.bind(_this);
-		// if (props.data.type == 'select') {
-		// 	window.getDataFromApp = (res) => this.setSelectValue(res)
-		// }
-		// if (props.data.type == 'date') {
-		// 	window.getDateFromApp = (res) => this.setSelectValue(res)
-		// }
-		return _this;
-	}
-
-	_createClass(Select, [{
-		key: 'setSelectValue',
-		value: function setSelectValue(data) {
-			this.setState({
-				select_val: data
-			});
-		}
-	}, {
-		key: 'handlerClick',
-		value: function handlerClick(event) {
-			// 调用app方法
-			var selectType = this.props.data.type;
-			switch (selectType) {
-				case 'select':
-					//调用app
-					_tool2.default.forAndroid('showSelected', JSON.stringify(this.props.data.options));
-					_tool2.default.forIos('showSelected', { body: this.props.data.options });
-					break;
-				case 'date':
-					this.educeAppSelectModule('showDate', 'showDateDialog', 1);
-					break;
-				case 'datetime':
-					this.educeAppSelectModule('showDate', 'showCalendarDialog', 3);
-					break;
-				case 'time':
-					this.educeAppSelectModule('showDate', 'showTimeDialog', 2);
-					break;
-			}
-		}
-		/**
-   * 唤起APP选择组件
-   * @param {string} Ios_module_name ios组件名
-   * @param {string} An_module_name android组件名
-   * @param {int} type ios参数
-   */
-
-	}, {
-		key: 'educeAppSelectModule',
-		value: function educeAppSelectModule(Ios_module_name, An_module_name, type) {
-			_tool2.default.forIos(Ios_module_name, { type: type });
-			_tool2.default.forAndroid(An_module_name);
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var selectModuleInfo = this.props.data;
-			return _react2.default.createElement(
-				'div',
-				{ className: 'wf-line type-select', onClick: this.handlerClick },
-				_react2.default.createElement(
-					'div',
-					{ className: 'form-title' },
-					selectModuleInfo.title
-				),
-				_react2.default.createElement(
-					'div',
-					{ className: 'form-main' },
-					_react2.default.createElement('input', { type: 'hidden', name: selectModuleInfo.name, value: this.state.select_val }),
-					this.state.select_val == '' ? _react2.default.createElement(
-						'span',
-						{ className: 'un_selected' },
-						'请选择' + selectModuleInfo.title
-					) : _react2.default.createElement(
-						'span',
-						{ className: 'is_selected' },
-						this.state.select_val
-					),
-					_react2.default.createElement('i', { className: 'select-arrow' })
-				)
-			);
-		}
-	}]);
-
-	return Select;
-}(_react2.default.Component);
-
-exports.default = Select;
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _tool = __webpack_require__(5);
-
-var _tool2 = _interopRequireDefault(_tool);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 申请工作流中的图片选择组件
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-function PicItem(props) {
-	return _react2.default.createElement(
-		'li',
-		null,
-		_react2.default.createElement('img', { src: props.url }),
-		_react2.default.createElement('i', { className: 'icon-close', 'data-index': props.index, onClick: props.handleDelPic })
-	);
-}
-
-function PicStore(props) {
-	var imgLists = props.imgLists.length > 0 && props.imgLists.map(function (item, index) {
-		return _react2.default.createElement(PicItem, { key: index, url: item, handleDelPic: props.handleDelPic, index: index });
-	});
-	return _react2.default.createElement(
-		'div',
-		{ className: 'pic-warehouse' },
-		_react2.default.createElement(
-			'ul',
-			null,
-			imgLists
-		)
-	);
-}
-
-var SelectPic = function (_React$Component) {
-	_inherits(SelectPic, _React$Component);
-
-	function SelectPic(props) {
-		_classCallCheck(this, SelectPic);
-
-		var _this = _possibleConstructorReturn(this, (SelectPic.__proto__ || Object.getPrototypeOf(SelectPic)).call(this, props));
-
-		_this.state = {
-			imgLists: ['https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=547138142,3998729701&fm=27&gp=0.jpg', 'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=547138142,3998729701&fm=27&gp=0.jpg']
-		};
-		_this.handleSelectPic = _this.handleSelectPic.bind(_this);
-		_this.handleDelPic = _this.handleDelPic.bind(_this);
-		return _this;
-	}
-
-	_createClass(SelectPic, [{
-		key: 'handleSelectPic',
-		value: function handleSelectPic() {
-			// 调用app选取图片方法
-			_tool2.default.forAndroid('startSelectPhotoActivity');
-		}
-	}, {
-		key: 'handleDelPic',
-		value: function handleDelPic(e) {
-			var lists = this.state.imgLists;
-			var index = Number(e.target.getAttribute('data-index'));
-			lists.splice(index, 1);
-			this.setState({
-				imgLists: lists
-			});
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			return _react2.default.createElement(
-				'div',
-				{ style: { background: "#fff" } },
-				_react2.default.createElement(
-					'div',
-					{ className: 'wf-line type-pic-select' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'form-title' },
-						'\u56FE\u7247'
-					),
-					_react2.default.createElement(
-						'div',
-						{ className: 'form-main', onClick: this.handleSelectPic },
-						_react2.default.createElement('i', { className: 'icon-select-pic' })
-					)
-				),
-				this.state.imgLists.length > 0 && _react2.default.createElement(PicStore, { imgLists: this.state.imgLists, handleDelPic: this.handleDelPic })
-			);
-		}
-	}]);
-
-	return SelectPic;
-}(_react2.default.Component);
-
-exports.default = SelectPic;
-
-/***/ }),
-/* 36 */,
 /* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18809,7 +19083,193 @@ exports.default = SelectPic;
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _tool = __webpack_require__(5);
+
+var _tool2 = _interopRequireDefault(_tool);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 图片选择
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+function PicItem(props) {
+    function photoViewer(event) {
+        // 图片查看器
+        var target = event.target;
+        var obj = { url: target.getAttribute('src'), fileName: target.getAttribute('data-filename') };
+        _tool2.default.forAndroid('openFile', JSON.stringify(obj));
+        _tool2.default.forIos('showAttachment', obj);
+    }
+    return _react2.default.createElement(
+        'li',
+        null,
+        _react2.default.createElement('img', { src: props.url, height: '44', width: '44', 'data-filename': props.file_name, 'data-relativepath': props.relative_path, onClick: photoViewer }),
+        !props.readOnly && _react2.default.createElement('button', { type: 'button', className: 'icon-close', 'data-relativepath': props.relative_path, onClick: props.handleClose })
+    );
+}
+
+var SelectPic = function (_React$Component) {
+    _inherits(SelectPic, _React$Component);
+
+    function SelectPic(props) {
+        _classCallCheck(this, SelectPic);
+
+        var _this = _possibleConstructorReturn(this, (SelectPic.__proto__ || Object.getPrototypeOf(SelectPic)).call(this, props));
+
+        _this.handleSelectPic = _this.handleSelectPic.bind(_this);
+        _this.handleClose = _this.handleClose.bind(_this);
+        //  console.log(props.data)
+        _this.state = {
+            picLists: props.data.value ? JSON.parse(props.data.value) : undefined
+            //  picFileValue: props.data.value
+        };
+        return _this;
+    }
+
+    _createClass(SelectPic, [{
+        key: 'addData',
+        value: function addData(arr) {
+            var tempArr = [];
+            arr.forEach(function (item) {
+                tempArr.push({
+                    file_name: item.fileName,
+                    relative_path: item.relativePath
+                });
+            });
+            return tempArr;
+        }
+    }, {
+        key: 'transformData',
+        value: function transformData(arr) {
+            var temparr = [];
+            arr.forEach(function (item) {
+                temparr.push({
+                    file_name: item.fileName,
+                    relative_path: item.relativePath
+                });
+            });
+            return temparr;
+        }
+    }, {
+        key: 'callback',
+        value: function callback(data) {
+            var _this2 = this;
+
+            // app 返回数据
+            var callbackData = JSON.parse(data);
+            this.setState(function (prevState) {
+                return {
+                    picLists: prevState.picLists ? [].concat(_toConsumableArray(prevState.picLists), _toConsumableArray(_this2.transformData(callbackData))) : _this2.transformData(callbackData)
+                    // picFileValue: [...prevState.picFileValue, ...this.addData(callbackData)]
+                };
+            });
+        }
+    }, {
+        key: 'handleSelectPic',
+        value: function handleSelectPic() {
+            // 选择图片
+            window.getImgLists = this.callback.bind(this);
+            _tool2.default.forAndroid('startSelectPhotoActivity');
+            _tool2.default.forIos('addPhoto', { body: '' });
+        }
+    }, {
+        key: 'handleClose',
+        value: function handleClose(event) {
+            // 删除选中的图片
+            var relative_path = event.target.getAttribute('data-relativepath');
+            this.setState(function (prevState) {
+                return {
+                    picLists: prevState.picLists.filter(function (item) {
+                        return item.relative_path !== relative_path;
+                    })
+                    // picFileValue: prevState.picFileValue.filter((item) => {
+                    //     return item.relative_path !== relative_path
+                    // })
+                };
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this3 = this;
+
+            var picSelectModuleInfo = this.props.data;
+            return _react2.default.createElement(
+                'div',
+                { style: { background: "#fff", marginBottom: '10px' } },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'wf-line type-pic-select' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-title' },
+                        picSelectModuleInfo.title
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-main' },
+                        picSelectModuleInfo.readOnly ? !picSelectModuleInfo.value && _react2.default.createElement(
+                            'span',
+                            { className: 'un_selected' },
+                            '\u65E0'
+                        ) : _react2.default.createElement(
+                            'button',
+                            { type: 'button', className: 'icon-select-pic', onClick: this.handleSelectPic },
+                            _react2.default.createElement('input', { type: 'hidden', id: 'pic_file', name: picSelectModuleInfo.name, value: JSON.stringify(this.state.picLists) })
+                        )
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'pic-warehouse' },
+                    _react2.default.createElement(
+                        'ul',
+                        null,
+                        this.state.picLists && this.state.picLists.map(function (item, index) {
+                            return _react2.default.createElement(PicItem, {
+                                key: index,
+                                readOnly: picSelectModuleInfo.readOnly,
+                                url: _this3.props.img_url + item.relative_path,
+                                file_name: item.file_name,
+                                relative_path: item.relative_path,
+                                handleClose: _this3.handleClose });
+                        })
+                    )
+                )
+            );
+        }
+    }]);
+
+    return SelectPic;
+}(_react2.default.Component);
+
+exports.default = SelectPic;
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -18829,158 +19289,295 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 申请工作流中的文件选择组件
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 单选组件
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
 
-function FileItem(props) {
-	function calcFileType() {
-		var splitArr = props.item.file_name.split('.');
-		var type = splitArr[splitArr.length - 1];
-		switch (type) {
-			case 'doc':
-			case 'docx':
-				return 'doc';
-				break;
-			case 'xls':
-				return 'excel';
-				break;
-			case 'pdf':
-				return 'pdf';
-				break;
-			case 'ppt':
-			case 'pptx':
-				return 'ppt';
-				break;
-			case 'txt':
-				return 'txt';
-				break;
-			case 'jpg':
-			case 'png':
-				return 'pic';
-				break;
-			default:
-				return 'file';
-				break;
-		}
-	}
-	return _react2.default.createElement(
-		'li',
-		null,
-		_react2.default.createElement(
-			'div',
-			null,
-			_react2.default.createElement('img', { src: './style/icon-' + calcFileType() + '.png', height: '44', width: '44' }),
-			_react2.default.createElement(
-				'span',
-				{ className: 'file-name' },
-				props.item.file_name
-			)
-		),
-		_react2.default.createElement('i', { className: 'icon-close', onClick: props.handleDelFile, 'data-index': props.index })
-	);
-}
-function FileStore(props) {
-	var fileLists = props.fileLists.length > 0 && props.fileLists.map(function (item, index) {
-		return _react2.default.createElement(FileItem, { key: index, item: item, handleDelFile: props.handleDelFile, index: index });
-	});
-	return _react2.default.createElement(
-		'div',
-		{ className: 'file-warehouse' },
-		_react2.default.createElement(
-			'ul',
-			null,
-			fileLists
-		)
-	);
-}
+var SingleSelect = function (_React$Component) {
+    _inherits(SingleSelect, _React$Component);
 
-var SelectFile = function (_React$Component) {
-	_inherits(SelectFile, _React$Component);
+    function SingleSelect(props) {
+        _classCallCheck(this, SingleSelect);
 
-	function SelectFile(props) {
-		_classCallCheck(this, SelectFile);
+        var _this = _possibleConstructorReturn(this, (SingleSelect.__proto__ || Object.getPrototypeOf(SingleSelect)).call(this, props));
 
-		var _this = _possibleConstructorReturn(this, (SelectFile.__proto__ || Object.getPrototypeOf(SelectFile)).call(this, props));
+        _this.state = {
+            value: props.data.value,
+            text: props.data.text
+        };
+        _this.handleSelectSingle = _this.handleSelectSingle.bind(_this);
+        return _this;
+    }
 
-		_this.state = {
-			fileList: [{
-				file_name: '公司重要.doc指纲领.doc'
-			}, {
-				file_name: '公司重.doc.docx要指纲领.docx'
-			}, {
-				file_name: '公司重要.doc指纲领.xls'
-			}, {
-				file_name: '公司重要.ppt指纲领.pdf'
-			}, {
-				file_name: '公司重要指纲领.ppt'
-			}, {
-				file_name: '公司重要指纲领.pptx'
-			}, {
-				file_name: '公司重要指纲领.png'
-			}, {
-				file_name: '公司重要指纲领.jpg'
-			}, {
-				file_name: '公司重要指纲领.sddd'
-			}, {
-				file_name: '公司重要指纲领.txt'
-			}]
-		};
-		_this.handleSelectFile = _this.handleSelectFile.bind(_this);
-		_this.handleDelFile = _this.handleDelFile.bind(_this);
-		return _this;
-	}
+    _createClass(SingleSelect, [{
+        key: 'callback',
+        value: function callback(data) {
+            if (window.temp_name == this.props.data.name) {
+                this.setState({
+                    value: JSON.parse(data).value,
+                    text: JSON.parse(data).name
+                });
+            }
+        }
+    }, {
+        key: 'handleSelectSingle',
+        value: function handleSelectSingle(event) {
+            window.temp_name = this.props.data.name;
+            window.getSelectDataFromApp = this.callback.bind(this);
+            var forAppData = this.props.data.options;
+            _tool2.default.forAndroid('showSelected', JSON.stringify(forAppData));
+            _tool2.default.forIos('showSelected', { body: forAppData });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var singleSelectModuleInfo = this.props.data;
+            return _react2.default.createElement(
+                'a',
+                { href: 'javascript:void(0);', className: 'wf-line type-select', onClick: this.handleSelectSingle },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'form-title' },
+                    singleSelectModuleInfo.title
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'form-main' },
+                    singleSelectModuleInfo.readOnly ? _react2.default.createElement(
+                        'span',
+                        { className: 'used_show' },
+                        singleSelectModuleInfo.options.filter(function (item) {
+                            return item.checked;
+                        })[0].name
+                    ) : _react2.default.createElement(
+                        'div',
+                        { className: 'inline-block' },
+                        _react2.default.createElement('input', { type: 'hidden', name: singleSelectModuleInfo.name, value: this.state.value || '' }),
+                        this.state.value == undefined ? _react2.default.createElement(
+                            'span',
+                            { className: 'un_selected' },
+                            '\u8BF7\u9009\u62E9',
+                            singleSelectModuleInfo.title
+                        ) : _react2.default.createElement(
+                            'span',
+                            { className: 'used_show' },
 
-	_createClass(SelectFile, [{
-		key: 'handleSelectFile',
-		value: function handleSelectFile(e) {
-			//app 选择附件
-			_tool2.default.forAndroid('startSelectFileActivity');
-		}
-	}, {
-		key: 'handleDelFile',
-		value: function handleDelFile(e) {
-			// 删除附件
-			var lists = this.state.fileList;
-			var index = Number(e.target.getAttribute('data-index'));
-			lists.splice(index, 1);
-			this.setState({
-				fileList: lists
-			});
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			return _react2.default.createElement(
-				'div',
-				{ style: { background: "#fff" } },
-				_react2.default.createElement(
-					'div',
-					{ className: 'wf-line type-file-select' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'form-title' },
-						'\u9644\u4EF6'
-					),
-					_react2.default.createElement(
-						'div',
-						{ className: 'form-main', onClick: this.handleSelectFile },
-						_react2.default.createElement('i', { className: 'icon-select-file' })
-					)
-				),
-				this.state.fileList.length > 0 && _react2.default.createElement(FileStore, { fileLists: this.state.fileList, handleDelFile: this.handleDelFile })
-			);
-		}
-	}]);
+                            // singleSelectModuleInfo.options.filter(item=>item.checked)[0].name
+                            this.state.text
+                        ),
+                        _react2.default.createElement('i', { className: 'select-arrow' })
+                    )
+                )
+            );
+        }
+    }]);
 
-	return SelectFile;
+    return SingleSelect;
 }(_react2.default.Component);
 
-exports.default = SelectFile;
+exports.default = SingleSelect;
 
 /***/ }),
-/* 38 */,
 /* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * textarea 框
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+var Textarea = function (_React$Component) {
+    _inherits(Textarea, _React$Component);
+
+    function Textarea(props) {
+        _classCallCheck(this, Textarea);
+
+        var _this = _possibleConstructorReturn(this, (Textarea.__proto__ || Object.getPrototypeOf(Textarea)).call(this, props));
+
+        _this.state = {
+            value: props.data.value || ''
+        };
+        _this.handleChange = _this.handleChange.bind(_this);
+        return _this;
+    }
+
+    _createClass(Textarea, [{
+        key: 'handleChange',
+        value: function handleChange(event) {
+            this.setState({ value: event.target.value });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var textareaModuleInfo = this.props.data;
+            return _react2.default.createElement(
+                'div',
+                { className: 'wf-line type-texearea' },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'form-title' },
+                    textareaModuleInfo.title
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'form-main' },
+                    textareaModuleInfo.readOnly ? _react2.default.createElement(
+                        'span',
+                        { className: 'used_show', style: { lineHeight: '1.5' } },
+                        this.state.value
+                    ) : _react2.default.createElement('textarea', { placeholder: '请填写' + textareaModuleInfo.title, name: textareaModuleInfo.name, value: this.state.value, onChange: this.handleChange })
+                )
+            );
+        }
+    }]);
+
+    return Textarea;
+}(_react2.default.Component);
+
+exports.default = Textarea;
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _tool = __webpack_require__(5);
+
+var _tool2 = _interopRequireDefault(_tool);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 日期选择组件
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+
+var TimeSelect = function (_React$Component) {
+    _inherits(TimeSelect, _React$Component);
+
+    function TimeSelect(props) {
+        _classCallCheck(this, TimeSelect);
+
+        var _this = _possibleConstructorReturn(this, (TimeSelect.__proto__ || Object.getPrototypeOf(TimeSelect)).call(this, props));
+
+        _this.state = {
+            value: props.data.value,
+            text: props.data.value
+        };
+        _this.handleSelectTime = _this.handleSelectTime.bind(_this);
+        return _this;
+    }
+
+    _createClass(TimeSelect, [{
+        key: 'callback',
+        value: function callback(data) {
+            if (window.temp_name == this.props.data.name) {
+                this.setState({
+                    value: data,
+                    text: data
+                });
+            }
+        }
+    }, {
+        key: 'handleSelectTime',
+        value: function handleSelectTime(event) {
+            window.temp_name = this.props.data.name;
+            window.getSelectDataFromApp = this.callback.bind(this);
+            var type = this.props.data.type;
+            if (type == 'date') {
+                _tool2.default.forIos('showDate', { type: 1 });
+                _tool2.default.forAndroid('showDateDialog');
+            }
+            if (type == 'datetime') {
+                _tool2.default.forIos('showDate', { type: 3 });
+                _tool2.default.forAndroid('showCalendarDialog');
+            }
+            if (type == 'time') {
+                _tool2.default.forIos('showDate', { type: 2 });
+                _tool2.default.forAndroid('showTimeDialog');
+            }
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var timeSelectModuleInfo = this.props.data;
+            return _react2.default.createElement(
+                'a',
+                { href: 'javascript:void(0);', className: 'wf-line type-select', onClick: this.handleSelectTime },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'form-title' },
+                    timeSelectModuleInfo.title
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'form-main' },
+                    timeSelectModuleInfo.readOnly ? _react2.default.createElement(
+                        'span',
+                        { className: 'used_show' },
+                        this.state.value
+                    ) : _react2.default.createElement(
+                        'div',
+                        { className: 'inline-block' },
+                        _react2.default.createElement('input', { type: 'hidden', name: timeSelectModuleInfo.name, value: this.state.value || '' }),
+                        this.state.value == undefined ? _react2.default.createElement(
+                            'span',
+                            { className: 'un_selected' },
+                            '\u8BF7\u9009\u62E9',
+                            timeSelectModuleInfo.title
+                        ) : _react2.default.createElement(
+                            'span',
+                            { className: 'is_selected' },
+                            this.state.text
+                        ),
+                        _react2.default.createElement('i', { className: 'select-arrow' })
+                    )
+                )
+            );
+        }
+    }]);
+
+    return TimeSelect;
+}(_react2.default.Component);
+
+exports.default = TimeSelect;
+
+/***/ }),
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18996,37 +19593,65 @@ var _reactDom = __webpack_require__(15);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _render_fixed = __webpack_require__(31);
-
-var _render_fixed2 = _interopRequireDefault(_render_fixed);
-
-var _render_normal = __webpack_require__(33);
-
-var _render_normal2 = _interopRequireDefault(_render_normal);
-
-var _render_select = __webpack_require__(34);
-
-var _render_select2 = _interopRequireDefault(_render_select);
-
-var _render_textarea = __webpack_require__(16);
-
-var _render_textarea2 = _interopRequireDefault(_render_textarea);
-
-var _render_select_pic = __webpack_require__(35);
-
-var _render_select_pic2 = _interopRequireDefault(_render_select_pic);
-
-var _render_slect_file = __webpack_require__(37);
-
-var _render_slect_file2 = _interopRequireDefault(_render_slect_file);
-
-var _render_hidden = __webpack_require__(32);
-
-var _render_hidden2 = _interopRequireDefault(_render_hidden);
-
 var _tool = __webpack_require__(5);
 
 var _tool2 = _interopRequireDefault(_tool);
+
+var _fixed = __webpack_require__(33);
+
+var _fixed2 = _interopRequireDefault(_fixed);
+
+var _normal = __webpack_require__(36);
+
+var _normal2 = _interopRequireDefault(_normal);
+
+var _hidden = __webpack_require__(35);
+
+var _hidden2 = _interopRequireDefault(_hidden);
+
+var _singleSelect = __webpack_require__(38);
+
+var _singleSelect2 = _interopRequireDefault(_singleSelect);
+
+var _timeSelect = __webpack_require__(40);
+
+var _timeSelect2 = _interopRequireDefault(_timeSelect);
+
+var _textarea = __webpack_require__(39);
+
+var _textarea2 = _interopRequireDefault(_textarea);
+
+var _picSelect = __webpack_require__(37);
+
+var _picSelect2 = _interopRequireDefault(_picSelect);
+
+var _fileSelect = __webpack_require__(32);
+
+var _fileSelect2 = _interopRequireDefault(_fileSelect);
+
+var _approved = __webpack_require__(30);
+
+var _approved2 = _interopRequireDefault(_approved);
+
+var _flowApporver = __webpack_require__(34);
+
+var _flowApporver2 = _interopRequireDefault(_flowApporver);
+
+var _btnWrap = __webpack_require__(29);
+
+var _btnWrap2 = _interopRequireDefault(_btnWrap);
+
+var _button = __webpack_require__(28);
+
+var _button2 = _interopRequireDefault(_button);
+
+var _currentTask = __webpack_require__(31);
+
+var _currentTask2 = _interopRequireDefault(_currentTask);
+
+var _noitem = __webpack_require__(16);
+
+var _noitem2 = _interopRequireDefault(_noitem);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19036,8 +19661,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var API_ROOT = 'http://192.168.10.223:7073';
-var formData = new FormData(document.getElementById('workflow'));
+var API_ROOT = 'http://192.168.10.223:7575';
+var REDIRECT = 'http://192.168.10.223.7272';
+
+// 申请工作流
 
 var ApplyWorkFlow = function (_React$Component) {
 	_inherits(ApplyWorkFlow, _React$Component);
@@ -19048,106 +19675,145 @@ var ApplyWorkFlow = function (_React$Component) {
 		var _this = _possibleConstructorReturn(this, (ApplyWorkFlow.__proto__ || Object.getPrototypeOf(ApplyWorkFlow)).call(this, props));
 
 		_this.state = {
-			formInfo: {}
+			RenderFormData: null, // 渲染表单的数据
+			is_error: false,
+			err_msg: ''
 		};
-
-		_this.handleSubmit = _this.handleSubmit.bind(_this);
 		_this.handleSave = _this.handleSave.bind(_this);
+		_this.handleSubmit = _this.handleSubmit.bind(_this);
+		_this.saveApprove = _this.saveApprove.bind(_this);
 		return _this;
 	}
-	// 提交工作流
-
 
 	_createClass(ApplyWorkFlow, [{
-		key: 'handleSubmit',
-		value: function handleSubmit() {
-			getDataFromApp();
-			alert('提交');
-		}
-		// 保存工作流
-
-	}, {
-		key: 'handleSave',
-		value: function handleSave() {
-			alert('保存');
-		}
-	}, {
 		key: 'componentDidMount',
 		value: function componentDidMount() {
 			var _this2 = this;
 
+			var submit_data = {
+				userId: _tool2.default.getUrlParam('userId'),
+				flowId: _tool2.default.getUrlParam('flowId'),
+				flowEntityId: _tool2.default.getUrlParam('flowEntityId')
+			};
 			var data = {
 				method: 'POST',
-				body: JSON.stringify({
-					userId: _tool2.default.getUrlParam('userId') || 108,
-					flowId: _tool2.default.getUrlParam('flowId') || 2,
-					flowEntityId: _tool2.default.getUrlParam('flowEntityId')
-				})
+				body: JSON.stringify(submit_data)
 				// 获取后台数据
 			};fetch(API_ROOT + '/api/processInstance/getFlowDetailH5', data).then(function (response) {
 				if (response.ok) {
 					return response.json();
 				}
 			}).then(function (data) {
-				_this2.setState({
-					formInfo: data
-				});
+				console.log(data);
+				if (data.data) {
+					var handle_status = data.data.handleStatus;
+					if (handle_status == '0' || handle_status == '2' || handle_status == '6') {
+						// 工作流状态
+						_this2.setState({
+							RenderFormData: data
+						});
+					} else {
+						window.location.href = 'http://192.168.10.223:7272/saasoa/workflowshow.html?userId=' + submit_data.userId + '&flowId=' + submit_data.flowId + '&flowEntityId=' + submit_data.flowEntityId;
+					}
+				} else {
+					_this2.setState({
+						is_error: true,
+						err_msg: data.message
+					});
+				}
 			}).catch(function (error) {
 				console.log(error);
 			});
 		}
 	}, {
+		key: 'handleSave',
+		value: function handleSave() {
+			// 保存工作流
+			var form = new FormData(this.refs.workflow);
+			var data = {
+				method: 'POST',
+				body: JSON.stringify(_tool2.default.makeUpData(form))
+			};
+			_tool2.default.fetchData(API_ROOT + '/api/processInstance/saveUserProcessForm', data);
+		}
+	}, {
+		key: 'handleSubmit',
+		value: function handleSubmit() {
+			// 提交工作流
+			var form = new FormData(this.refs.workflow);
+			var data = {
+				method: 'POST',
+				body: JSON.stringify(_tool2.default.makeUpData(form))
+			};
+			_tool2.default.fetchData(API_ROOT + '/api/processInstance/saveFormAndStartProcess', data);
+		}
+	}, {
+		key: 'saveApprove',
+		value: function saveApprove() {
+			// 保存审核
+			var form = new FormData(this.refs.workflow);
+			var data = {
+				method: 'POST',
+				body: JSON.stringify(_tool2.default.makeUpData(form))
+			};
+			_tool2.default.fetchData(API_ROOT + '/api/processInstance/submitApproveAndForm', data);
+		}
+	}, {
 		key: 'render',
 		value: function render() {
-			var renderData = this.state.formInfo.data;
-			var renderFormData = renderData && renderData.tableData;
-			var formItems = renderFormData && renderFormData.map(function (form, index) {
-				var type = form.type;
-				switch (type) {
-					case 'hidden':
-						return _react2.default.createElement(_render_hidden2.default, { data: form, key: index });
-						break;
-					case 'text':
-						return _react2.default.createElement(_render_normal2.default, { data: form, key: index });
-						break;
-					case 'select':
-					case 'datetime':
-					case 'date':
-					case 'time':
-						return _react2.default.createElement(_render_select2.default, { data: form, key: index });
-						break;
-					case 'textarea':
-						return _react2.default.createElement(_render_textarea2.default, { data: form, key: index });
-						break;
-				}
-			});
-			return _react2.default.createElement(
-				'form',
-				{ id: 'workflow' },
-				_react2.default.createElement(_render_fixed2.default, { title: '\u7533\u8BF7\u4EBA', name: renderData && renderData.user.name }),
-				_react2.default.createElement(_render_fixed2.default, { title: '\u6240\u5C5E\u90E8\u95E8', name: renderData && renderData.user.department }),
-				formItems,
-				_react2.default.createElement(_render_select_pic2.default, null),
-				_react2.default.createElement(_render_slect_file2.default, null),
-				_react2.default.createElement(
-					'div',
-					{ className: 'btn-area' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'inner' },
-						_react2.default.createElement(
-							'button',
-							{ type: 'button', className: 'submit', onClick: this.handleSubmit },
-							'\u63D0\u4EA4'
-						),
-						_react2.default.createElement(
-							'button',
-							{ type: 'button', className: 'save', onClick: this.handleSave },
-							'\u4FDD\u5B58'
-						)
+			if (this.state.RenderFormData) {
+				var data = this.state.RenderFormData.data;
+				var formItems = data.tableData.map(function (item, index) {
+					var type = item.type;
+					switch (type) {
+						case 'hidden':
+							return _react2.default.createElement(_hidden2.default, { data: item, key: index });
+							break;
+						case 'text':
+							return _react2.default.createElement(_normal2.default, { data: item, key: index });
+							break;
+						case 'select':
+						case 'radio':
+							return _react2.default.createElement(_singleSelect2.default, { data: item, key: index });
+							break;
+						case 'datetime':
+						case 'date':
+						case 'time':
+							return _react2.default.createElement(_timeSelect2.default, { data: item, key: index });
+							break;
+						case 'textarea':
+							return _react2.default.createElement(_textarea2.default, { data: item, key: index });
+							break;
+						case 'input_img':
+							return _react2.default.createElement(_picSelect2.default, { data: item, img_url: data.img_url, key: index });
+						case 'input_accessory':
+							return _react2.default.createElement(_fileSelect2.default, { data: item, file_url: data.img_url, key: index });
+					}
+				});
+				return _react2.default.createElement(
+					'form',
+					{ id: 'workflow', ref: 'workflow' },
+					_react2.default.createElement(_fixed2.default, { title: '\u6D41\u7A0B\u540D\u79F0', text: data.flowName }),
+					data.handleStatus !== '0' && _react2.default.createElement(_fixed2.default, { title: '\u6D41\u7A0B\u7F16\u53F7', text: data.flowNo }),
+					_react2.default.createElement(_fixed2.default, { title: '\u7533\u8BF7\u4EBA', text: data.user.name }),
+					_react2.default.createElement(_fixed2.default, { title: '\u6240\u5C5E\u90E8\u95E8', text: data.user.department }),
+					_react2.default.createElement('p', { className: 'mb10' }),
+					formItems,
+					data.handleStatus !== '0' && _react2.default.createElement(_currentTask2.default, { currentTaskName: data.currentTaskName, isEnd: data.isEnd }),
+					data.flowApprover && _react2.default.createElement(_flowApporver2.default, { flowApprover: data.flowApprover }),
+					data.handleStatus == '2' && _react2.default.createElement(_approved2.default, { is_first_task: data.isFirstTask, current_task_name: data.currentTaskName, handleClick: this.saveApprove }),
+					data.handleStatus == '0' && _react2.default.createElement(
+						_btnWrap2.default,
+						null,
+						_react2.default.createElement(_button2.default, { class_name: 'submit', button_text: '\u63D0\u4EA4', onClick: this.handleSubmit }),
+						_react2.default.createElement(_button2.default, { class_name: 'save', button_text: '\u4FDD\u5B58', onClick: this.handleSave })
 					)
-				)
-			);
+				);
+			}
+			if (this.state.is_error) {
+				return _react2.default.createElement(_noitem2.default, { message: this.state.err_msg });
+			}
+			return null;
 		}
 	}]);
 

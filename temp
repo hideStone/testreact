@@ -1,0 +1,85 @@
+constructor(props){
+		super(props)
+		this.state = {
+			formInfo: {}
+		}
+		
+		this.handleSubmit = this.handleSubmit.bind(this)
+		this.handleSave = this.handleSave.bind(this)
+	}
+	// 提交工作流
+	handleSubmit() {
+		// window.callback(Math.random())
+		// alert('提交')
+	}
+	// 保存工作流
+	handleSave() {
+		alert('保存')
+	}
+
+	componentDidMount() {
+		const data = {
+			method: 'POST',
+			body:JSON.stringify({
+				userId: tool.getUrlParam('userId') || 108,
+				flowId: tool.getUrlParam('flowId') || 2,
+				flowEntityId: tool.getUrlParam('flowEntityId')
+			})
+		}
+		// 获取后台数据
+		fetch(API_ROOT + '/api/processInstance/getFlowDetailH5', data).then((response) => {
+			if (response.ok) {
+				return response.json()
+			}
+		}).then((data) => {
+			console.log(data)
+			this.setState({
+				formInfo: data
+			})
+		}).catch((error) => {
+			console.log(error)
+		})
+	}
+  	render() {
+		const renderData = this.state.formInfo.data
+		const renderFormData = renderData && renderData.tableData;
+		const formItems = renderFormData && renderFormData.map((form, index) => {
+			let type = form.type
+			switch(type) {
+				case 'hidden':
+					return <Hidden data={form} key={index}/>
+					break;
+				case 'text':
+					return <Normal data={form} key={index}/>	
+					break;
+				case 'select':
+				case 'datetime':
+				case 'date':
+				case 'time':
+					return <Select data={form} key={index}/>
+					break;
+				case 'textarea':
+					return <Textarea data={form} key={index}/>
+					break;
+			}
+		})
+    	return (
+    		<form id="workflow">
+    			<Fixed title="流程名称" name={renderData && renderData.flowName} />
+    			{
+    				renderData && renderData.handleStatus != '0' ? 
+    				(<Fixed title="流程编号" name={renderData && renderData.flowNo} />)
+    				: ''
+    			}
+    			<Fixed title="申请人" name={renderData && renderData.user.name} />
+    			<Fixed title="所属部门" name={renderData && renderData.user.department} />
+				{formItems}
+				{/* <SelectPic/>
+				<SelectFile/> */}
+    			<ButtonWrap>
+					<Button buttonText="提交" class_name="submit" handleClick={this.handleSubmit}/>
+					<Button buttonText="保存" class_name="save" handleClick={this.handleSave}/>
+				</ButtonWrap>
+    		</form>
+    	)
+  	}

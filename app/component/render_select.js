@@ -10,37 +10,40 @@ class Select extends React.Component{
 			select_val: ''
 		}
 		this.handlerClick = this.handlerClick.bind(this)
-		// if (props.data.type == 'select') {
-		// 	window.getDataFromApp = (res) => this.setSelectValue(res)
-		// }
-		// if (props.data.type == 'date') {
-		// 	window.getDateFromApp = (res) => this.setSelectValue(res)
-		// }
+		// console.log(this.props.data.name)
+	}
+	callback(data) {
+		if (window.tempname == this.props.data.name) {
+			this.setState({
+				select_val: data
+			})
+		}
 	}
 	setSelectValue(data) {
-		this.setState({
-			select_val: data
-		})
+		
 	}
 	handlerClick(event) {
+		// console.log(this.props.data.name)
+		window.tempname = this.props.data.name
+		window.callback = this.callback.bind(this)
 		// 调用app方法
-		const selectType = this.props.data.type
-		switch(selectType){
-			case 'select':
-				//调用app
-				tool.forAndroid('showSelected', JSON.stringify(this.props.data.options))
-				tool.forIos('showSelected', {body: this.props.data.options})
-				break;
-			case 'date':
-				this.educeAppSelectModule('showDate', 'showDateDialog', 1)
-				break;
-			case 'datetime':
-				this.educeAppSelectModule('showDate', 'showCalendarDialog', 3)
-				break;
-			case 'time':
-				this.educeAppSelectModule('showDate', 'showTimeDialog', 2)
-				break;	
-		}
+		// const selectType = this.props.data.type
+		// switch(selectType){
+		// 	case 'select':
+		// 		//调用app
+		// 		tool.forAndroid('showSelected', JSON.stringify(this.props.data.options))
+		// 		tool.forIos('showSelected', {body: this.props.data.options})
+		// 		break;
+		// 	case 'date':
+		// 		this.educeAppSelectModule('showDate', 'showDateDialog', 1)
+		// 		break;
+		// 	case 'datetime':
+		// 		this.educeAppSelectModule('showDate', 'showCalendarDialog', 3)
+		// 		break;
+		// 	case 'time':
+		// 		this.educeAppSelectModule('showDate', 'showTimeDialog', 2)
+		// 		break;	
+		// }
 	}
 	/**
 	 * 唤起APP选择组件
@@ -55,7 +58,7 @@ class Select extends React.Component{
 	render() {
 		const selectModuleInfo = this.props.data
 		return(
-			<div className="wf-line type-select" onClick={this.handlerClick}>
+			<a href="javascript:void(0);" className="wf-line type-select" onClick={this.handlerClick}>
 				<div className="form-title">{selectModuleInfo.title}</div>
 				<div className="form-main">
 					<input type="hidden" name={selectModuleInfo.name} value={this.state.select_val}/>
@@ -65,7 +68,7 @@ class Select extends React.Component{
 					}
 					<i className="select-arrow"></i>
 				</div>
-			</div>
+			</a>
 		)
 	}
 }

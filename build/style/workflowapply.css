@@ -52,16 +52,24 @@ span.is_selected,span.used_show{
 	line-height: 20px;
 	margin-right:30px;
 }
-.wf-line .form-main{
-	// flex:1;
-}
 .wf-line .form-main input{
-	width:70%;
+	width:200px;
 	line-height: 18px;
 	color:#404040;
 }
 .type-select,.type-pic-select,.type-file-select{
+	display: flex;
 	justify-content: space-between;
+}
+.type-select .form-main,.type-pic-select .form-main,.type-file-select .form-main{
+	flex: 1;
+	text-align: right;
+}
+.type-select .form-main .show_module,.type-pic-select .form-main .show_module,.type-file-select .form-main .show_module{
+	width:80%;
+}
+.type-select .form-main{
+	line-height: 16px;
 }
 .type-select .form-main i.select-arrow{
 	height: 15px;
@@ -69,6 +77,13 @@ span.is_selected,span.used_show{
 	background:url('./arrow-right.png') no-repeat center;
 	background-size:contain;
 	vertical-align: middle;
+}
+.type-select .form-main .show_module span{
+	width:100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-align: right;
 }
 .type-texearea{
 	align-items: flex-start;
@@ -86,27 +101,28 @@ span.is_selected,span.used_show{
 	color:#404040;
 	line-height: 1.5;
 }
-.type-pic-select,.type-file-select{
-	margin:10px 0;
-}
-.type-pic-select i.icon-select-pic{
+
+.type-pic-select button.icon-select-pic{
 	height: 25px;
 	width:25px;
 	background: url('./type-select-pic.png') no-repeat center;
 	background-size: cover;
 }
-.type-file-select i.icon-select-file{
+.type-file-select button.icon-select-file{
 	height: 25px;
 	width:25px;
 	background: url('./type-select-file.png') no-repeat center;
 	background-size: cover;
 }
 .btn-area{
+	background:#fff;
+}
+.is_fixed_bottom{
 	position: fixed;
 	width:100%;
 	bottom:0;
 	left:0;
-	background:#fff
+	z-index:100;
 }
 .btn-area .inner{
 	padding:12px 15px;
@@ -142,10 +158,11 @@ span.is_selected,span.used_show{
 	height: 75px;
 	border-radius: 3px;
 	overflow: hidden;
-	margin-bottom:15px;
+	margin-bottom:7px;
+	margin-top:7px;
 }
 .pic-warehouse ul li:not(:nth-child(4n+4)){
-	margin-right:15px;
+	margin-right:10px;
 }
 .pic-warehouse ul li img{
 	height: 100%;
@@ -159,6 +176,7 @@ span.is_selected,span.used_show{
 	right:5px;
 	background:url('./oa-close-icon.png') no-repeat;
 	background-size:contain;
+	z-index: 10;
 }
 .file-warehouse ul li{
 	position: relative;
@@ -180,7 +198,13 @@ span.is_selected,span.used_show{
 }
 .file-warehouse ul li .file-name{
 	color:#404040;
+	width:200px;
+	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 	font-size:14px;	
+	vertical-align: middle;
 }
 .file-warehouse ul li img{
 	height: 22px;
@@ -196,6 +220,42 @@ span.is_selected,span.used_show{
 	background:url('./oa-close-icon.png') no-repeat;
 	background-size:contain;
 }
+.type-radio .form-main span{
+	line-height: 16px;
+}
+.type-radio .form-main span:not(:last-child){
+	margin-right:10px;
+}
+.type-radio .form-main input[type="radio"]{
+	display: none;
+}
+.type-radio .form-main input[type="radio"] + label{
+	padding-left:22px;
+	color:#404040;
+	background:url('./icon-unselect.png') no-repeat left center;
+	background-size:15px 15px;
+}
+.type-radio .form-main input[type="radio"]:checked + label{
+	background:url('./icon-select.png') no-repeat left center;
+	background-size:15px 15px;
+}
+.current_spr,.current_task{
+	display: flex;
+	background:#fff;
+	padding: 5px 15px;
+}
+.current_spr span.title,.current_task span.title{
+	color: #404040;
+    width: 56px;
+    margin-right: 15px;
+	line-height: 20px;
+	margin-right:30px;
+}
+.current_spr span.used_show, .current_task span.used_show{
+	color: #404040;
+    line-height: 20px;
+}
+
 
 
 

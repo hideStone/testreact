@@ -50,6 +50,9 @@ li {
 a {
   text-decoration: none;
 }
+a:active{
+  background: transparent;
+}
 table {
   border-collapse: collapse;
   border-spacing: 0;
@@ -68,7 +71,6 @@ button {
   background: transparent;
 }
 .sp-between {
-  display: -webkit-flex;
   justify-content: space-between;
 }
 .al-items {
@@ -84,3 +86,29 @@ button {
 *{
   box-sizing: border-box;
 }
+::-webkit-selection{
+  background:transparent;
+}
+.no-item{
+  display: flex;
+  height: 80vh;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+.no-item div{
+  height: 140px;
+  width:150px;
+  background:url('./no-item.png') no-repeat;
+  background-size:contain;
+  margin:0 auto 20px;
+}
+.no-item p{
+  text-align:center;
+  color:#d0d0d0;
+  font-size:16px
+}
+.mb10{
+  margin-bottom: 10px;
+}
+-webkit-tap-highlight-color:transparent

@@ -1,4 +1,25 @@
 const tool = {
+	fetchData(url, data, cb) {
+		this.forIos('showLoading', { body: '' })
+		this.forAndroid('showLoading')
+		fetch(url, data).then((response) => {
+			this.forIos('dismissLoading', { body: '' })
+			this.forAndroid('dismissLoading')
+			if(response.ok) {
+				return response.json()
+			}
+		}).then((res) => {
+			if (res.status > 0) {
+				this.forIos('submitSuccess', { message: res.message })
+				this.forAndroid('showToastAndFinish', res.message)
+			} else {
+				this.forIos('submitFail', { message: res.message })
+				this.forAndroid('showToast', res.message)
+			}
+		}).catch((error)=>{
+			console.log(error)
+		})
+	},
 	/**
 	 * 处理url
 	 * @param  {[string]} name [description]
@@ -42,6 +63,46 @@ const tool = {
 	        isAnd: isAndroid,
 	        isIOS: isiOS
 	    }
+	},
+	calc_file_type(url) {
+		const splitArr = url.split('.')
+		const type = splitArr[splitArr.length - 1]
+		switch(type) {
+			case 'doc':
+			case 'docx':
+				return 'doc'
+				break;
+			case 'xls':
+				return 'excel'
+				break;
+			case 'pdf':
+				return 'pdf'
+				break;
+			case 'ppt':
+			case 'pptx':
+				return 'ppt'
+				break;
+			case 'txt':
+				return 'txt'
+				break;
+			case 'jpg':
+			case 'JPG':
+			case 'png':
+			case 'PNG':
+				return 'pic'
+				break;
+			default:
+				return 'file'
+				break;
+		}
+	},
+	makeUpData(data) {
+		const initData = data
+		const tempObj = {}
+		for(let entrie of initData.entries()) {
+			tempObj[entrie[0]] = entrie[1]
+		}
+		return tempObj
 	}
 }
 

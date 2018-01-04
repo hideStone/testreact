@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 40);
+/******/ 	return __webpack_require__(__webpack_require__.s = 42);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -445,6 +445,30 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 var tool = {
+	fetchData: function fetchData(url, data, cb) {
+		var _this = this;
+
+		this.forIos('showLoading', { body: '' });
+		this.forAndroid('showLoading');
+		fetch(url, data).then(function (response) {
+			_this.forIos('dismissLoading', { body: '' });
+			_this.forAndroid('dismissLoading');
+			if (response.ok) {
+				return response.json();
+			}
+		}).then(function (res) {
+			if (res.status > 0) {
+				_this.forIos('submitSuccess', { message: res.message });
+				_this.forAndroid('showToastAndFinish', res.message);
+			} else {
+				_this.forIos('submitFail', { message: res.message });
+				_this.forAndroid('showToast', res.message);
+			}
+		}).catch(function (error) {
+			console.log(error);
+		});
+	},
+
 	/**
   * 处理url
   * @param  {[string]} name [description]
@@ -491,6 +515,68 @@ var tool = {
 			isAnd: isAndroid,
 			isIOS: isiOS
 		};
+	},
+	calc_file_type: function calc_file_type(url) {
+		var splitArr = url.split('.');
+		var type = splitArr[splitArr.length - 1];
+		switch (type) {
+			case 'doc':
+			case 'docx':
+				return 'doc';
+				break;
+			case 'xls':
+				return 'excel';
+				break;
+			case 'pdf':
+				return 'pdf';
+				break;
+			case 'ppt':
+			case 'pptx':
+				return 'ppt';
+				break;
+			case 'txt':
+				return 'txt';
+				break;
+			case 'jpg':
+			case 'JPG':
+			case 'png':
+			case 'PNG':
+				return 'pic';
+				break;
+			default:
+				return 'file';
+				break;
+		}
+	},
+	makeUpData: function makeUpData(data) {
+		var initData = data;
+		var tempObj = {};
+		var _iteratorNormalCompletion = true;
+		var _didIteratorError = false;
+		var _iteratorError = undefined;
+
+		try {
+			for (var _iterator = initData.entries()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+				var entrie = _step.value;
+
+				tempObj[entrie[0]] = entrie[1];
+			}
+		} catch (err) {
+			_didIteratorError = true;
+			_iteratorError = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion && _iterator.return) {
+					_iterator.return();
+				}
+			} finally {
+				if (_didIteratorError) {
+					throw _iteratorError;
+				}
+			}
+		}
+
+		return tempObj;
 	}
 };
 
@@ -1052,10 +1138,8 @@ if (process.env.NODE_ENV === 'production') {
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+    value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(0);
 
@@ -1063,60 +1147,21 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 渲染textarea
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-
-var Textarea = function (_React$Component) {
-	_inherits(Textarea, _React$Component);
-
-	function Textarea(props) {
-		_classCallCheck(this, Textarea);
-
-		var _this = _possibleConstructorReturn(this, (Textarea.__proto__ || Object.getPrototypeOf(Textarea)).call(this, props));
-
-		_this.state = {
-			value: ''
-		};
-		_this.handleChange = _this.handleChange.bind(_this);
-		return _this;
-	}
-
-	_createClass(Textarea, [{
-		key: 'handleChange',
-		value: function handleChange(event) {
-			this.setState({ value: event.target.value });
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var textareaInputInfo = this.props.data;
-			return _react2.default.createElement(
-				'div',
-				{ className: 'wf-line type-texearea' },
-				_react2.default.createElement(
-					'div',
-					{ className: 'form-title' },
-					textareaInputInfo.title
-				),
-				_react2.default.createElement(
-					'div',
-					{ className: 'form-main' },
-					_react2.default.createElement('textarea', { placeholder: '请输入' + textareaInputInfo.title, value: this.state.value, onChange: this.handleChange })
-				)
-			);
-		}
-	}]);
-
-	return Textarea;
-}(_react2.default.Component);
-
-exports.default = Textarea;
+function NoItem(props) {
+    return _react2.default.createElement(
+        "div",
+        { className: "no-item" },
+        _react2.default.createElement("div", null),
+        _react2.default.createElement(
+            "p",
+            null,
+            props.message
+        )
+    );
+} /**
+   * 出错
+   */
+exports.default = NoItem;
 
 /***/ }),
 /* 17 */
@@ -18381,393 +18426,21 @@ isValidElement:K,version:"16.2.0",__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_F
 
 
 /***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 渲染工作流展示图片
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-function PicItem(props) {
-    return _react2.default.createElement(
-        "li",
-        null,
-        _react2.default.createElement("img", { src: props.url })
-    );
-}
-
-function PicWraper(props) {
-    var piclists = props.piclist.map(function (item, index) {
-        return _react2.default.createElement(PicItem, { url: item.url, key: index });
-    });
-    return _react2.default.createElement(
-        "ul",
-        null,
-        piclists
-    );
-}
-
-var PicStore = function (_React$Component) {
-    _inherits(PicStore, _React$Component);
-
-    function PicStore(props) {
-        _classCallCheck(this, PicStore);
-
-        var _this = _possibleConstructorReturn(this, (PicStore.__proto__ || Object.getPrototypeOf(PicStore)).call(this, props));
-
-        _this.state = {};
-        return _this;
-    }
-
-    _createClass(PicStore, [{
-        key: "render",
-        value: function render() {
-            return _react2.default.createElement(
-                "div",
-                { className: "wf-line show-pic" },
-                _react2.default.createElement(
-                    "div",
-                    { className: "form-title" },
-                    "\u56FE\u7247"
-                ),
-                _react2.default.createElement(
-                    "div",
-                    { className: "form-main" },
-                    _react2.default.createElement(PicWraper, { piclist: props.picLists })
-                )
-            );
-        }
-    }]);
-
-    return PicStore;
-}(_react2.default.Component);
-
-exports.default = PicStore;
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _render_textarea = __webpack_require__(16);
-
-var _render_textarea2 = _interopRequireDefault(_render_textarea);
-
-var _render_radio = __webpack_require__(38);
-
-var _render_radio2 = _interopRequireDefault(_render_radio);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 审批模块
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-
-var Approved = function (_React$Component) {
-    _inherits(Approved, _React$Component);
-
-    function Approved(props) {
-        _classCallCheck(this, Approved);
-
-        var _this = _possibleConstructorReturn(this, (Approved.__proto__ || Object.getPrototypeOf(Approved)).call(this, props));
-
-        _this.state = {
-            is_show_back: false
-        };
-        _this.isShowBack = _this.isShowBack.bind(_this);
-        return _this;
-    }
-
-    _createClass(Approved, [{
-        key: 'isShowBack',
-        value: function isShowBack(bool) {
-            this.setState({
-                is_show_back: bool
-            });
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            return _react2.default.createElement(
-                'form',
-                null,
-                _react2.default.createElement(
-                    'div',
-                    { className: 'wf-line type-radio' },
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'form-title' },
-                        '\u5BA1\u6279\u610F\u89C1'
-                    ),
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'form-main' },
-                        _react2.default.createElement(_render_radio2.default, { id: '1', name: 'approve_suggestion', isShowBack: this.isShowBack, label: '\u540C\u610F' }),
-                        _react2.default.createElement(_render_radio2.default, { id: '2', name: 'approve_suggestion', isShowBack: this.isShowBack, label: '\u4E0D\u540C\u610F' }),
-                        _react2.default.createElement(_render_radio2.default, { id: '3', name: 'approve_suggestion', isShowBack: this.isShowBack, label: '\u9000\u56DE' })
-                    )
-                ),
-                this.state.is_show_back && _react2.default.createElement(
-                    'div',
-                    { className: 'wf-line type-radio' },
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'form-title' },
-                        '\u9000\u56DE\u9009\u62E9'
-                    ),
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'form-main' },
-                        _react2.default.createElement(_render_radio2.default, { id: '4', name: 'back_chose', label: '\u9000\u56DE\u5BA1\u6279\u4EBA' }),
-                        _react2.default.createElement(_render_radio2.default, { id: '5', name: 'back_chose', label: '\u9000\u56DE\u4E0A\u4E00\u7EA7' })
-                    )
-                ),
-                _react2.default.createElement(_render_textarea2.default, { data: { title: '审批备注' } })
-            );
-        }
-    }]);
-
-    return Approved;
-}(_react2.default.Component);
-
-exports.default = Approved;
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * 渲染工作流展示文件
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-
-function FileItem(props) {
-    return _react2.default.createElement(
-        "li",
-        null,
-        _react2.default.createElement("img", { src: "./style/icon-word.png", height: "44", width: "44" }),
-        _react2.default.createElement(
-            "span",
-            { className: "file-name" },
-            "\u516C\u53F8\u91CD\u8981\u6307\u5BFC\u7EB2\u9886.doc"
-        )
-    );
-}
-function FileWraper(props) {
-    var filelists = props.filelist.map(function (item, index) {
-        return _react2.default.createElement(FileItem, null);
-    });
-    return _react2.default.createElement(
-        "ul",
-        null,
-        filelists
-    );
-}
-
-var FileStore = function (_React$Component) {
-    _inherits(FileStore, _React$Component);
-
-    function FileStore(props) {
-        _classCallCheck(this, FileStore);
-
-        return _possibleConstructorReturn(this, (FileStore.__proto__ || Object.getPrototypeOf(FileStore)).call(this, props));
-    }
-
-    _createClass(FileStore, [{
-        key: "render",
-        value: function render() {
-            return _react2.default.createElement(
-                "div",
-                { "class": "wf-line show-file" },
-                _react2.default.createElement(
-                    "div",
-                    { "class": "form-title" },
-                    "\u9644\u4EF6"
-                ),
-                _react2.default.createElement(
-                    "div",
-                    { "class": "form-main" },
-                    _react2.default.createElement(FileWraper, null)
-                )
-            );
-        }
-    }]);
-
-    return FileStore;
-}(_react2.default.Component);
-
-exports.default = FileStore;
-
-/***/ }),
+/* 28 */,
+/* 29 */,
+/* 30 */,
 /* 31 */,
 /* 32 */,
 /* 33 */,
 /* 34 */,
 /* 35 */,
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function ShowLists(props) {
-    return _react2.default.createElement(
-        "li",
-        null,
-        _react2.default.createElement(
-            "span",
-            { className: "title" },
-            props.title
-        ),
-        _react2.default.createElement(
-            "span",
-            { className: "used_show" },
-            props.content
-        )
-    );
-} /**
-   * 工作流已经申请后的列表item
-   */
-
-exports.default = ShowLists;
-
-/***/ }),
+/* 36 */,
 /* 37 */,
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Radio = function (_React$Component) {
-    _inherits(Radio, _React$Component);
-
-    function Radio(props) {
-        _classCallCheck(this, Radio);
-
-        var _this = _possibleConstructorReturn(this, (Radio.__proto__ || Object.getPrototypeOf(Radio)).call(this, props));
-
-        _this.state = {
-            value: ""
-        };
-        _this.handlRadio = _this.handlRadio.bind(_this);
-        return _this;
-    }
-
-    _createClass(Radio, [{
-        key: "handlRadio",
-        value: function handlRadio(e) {
-            if (e.target.id < 4) {
-                e.target.id == 3 ? this.props.isShowBack(true) : this.props.isShowBack(false);
-            }
-        }
-    }, {
-        key: "render",
-        value: function render() {
-            return _react2.default.createElement(
-                "span",
-                null,
-                _react2.default.createElement("input", { type: "radio", id: this.props.id, name: this.props.name, value: this.state.value, onChange: this.handlRadio }),
-                _react2.default.createElement(
-                    "label",
-                    { htmlFor: this.props.id },
-                    this.props.label
-                )
-            );
-        }
-    }]);
-
-    return Radio;
-}(_react2.default.Component);
-
-exports.default = Radio;
-
-/***/ }),
+/* 38 */,
 /* 39 */,
-/* 40 */
+/* 40 */,
+/* 41 */,
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18783,21 +18456,9 @@ var _reactDom = __webpack_require__(15);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _render_show_list = __webpack_require__(36);
+var _noitem = __webpack_require__(16);
 
-var _render_show_list2 = _interopRequireDefault(_render_show_list);
-
-var _render_approved = __webpack_require__(29);
-
-var _render_approved2 = _interopRequireDefault(_render_approved);
-
-var _rendder_display_pic = __webpack_require__(28);
-
-var _rendder_display_pic2 = _interopRequireDefault(_rendder_display_pic);
-
-var _render_display_file = __webpack_require__(30);
-
-var _render_display_file2 = _interopRequireDefault(_render_display_file);
+var _noitem2 = _interopRequireDefault(_noitem);
 
 var _tool = __webpack_require__(5);
 
@@ -18811,25 +18472,96 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var API_ROOT = 'http://192.168.10.223:7073';
+var API_ROOT = 'http://192.168.10.223:7575';
 
-function ApplyLists(props) {
-    var renderData = props.data;
-    var renderFormData = renderData && renderData.tableData;
-    var apply_list = renderFormData && renderFormData.map(function (item, index) {
-        if (item.type != 'hidden') {
-            return _react2.default.createElement(_render_show_list2.default, { title: item.title, content: item.value, key: index });
-        }
-    });
+function ListItem(props) {
     return _react2.default.createElement(
-        'ul',
-        { className: 'apply-list' },
-        _react2.default.createElement(_render_show_list2.default, { title: '\u6D41\u7A0B\u7F16\u53F7', content: renderData && renderData.flowNo }),
-        _react2.default.createElement(_render_show_list2.default, { title: '\u6D41\u7A0B\u540D\u79F0', content: renderData && renderData.flowName }),
-        _react2.default.createElement(_render_show_list2.default, { title: '\u7533\u8BF7\u4EBA', content: renderData && renderData.user.name }),
-        _react2.default.createElement(_render_show_list2.default, { title: '\u5DE5\u53F7', content: renderData && renderData.user.sn }),
-        _react2.default.createElement(_render_show_list2.default, { title: '\u6240\u5C5E\u90E8\u95E8', content: renderData && renderData.user.department }),
-        apply_list
+        'li',
+        null,
+        _react2.default.createElement(
+            'span',
+            { className: 'title' },
+            props.title
+        ),
+        _react2.default.createElement(
+            'span',
+            { className: 'used_show' },
+            props.value
+        )
+    );
+}
+function ImgList(props) {
+    function phoneViewer(event) {
+        var target = event.target;
+        var obj = { url: target.getAttribute('src'), fileName: target.getAttribute('data-filename') };
+        _tool2.default.forAndroid('openFile', JSON.stringify(obj));
+        _tool2.default.forIos('showAttachment', obj);
+    }
+    return props.value !== '' && _react2.default.createElement(
+        'div',
+        { className: 'wf-line show-pic' },
+        _react2.default.createElement(
+            'div',
+            { className: 'form-title' },
+            props.title
+        ),
+        _react2.default.createElement(
+            'div',
+            { className: 'form-main' },
+            _react2.default.createElement(
+                'ul',
+                null,
+                JSON.parse(props.value).map(function (item, index) {
+                    return _react2.default.createElement(
+                        'li',
+                        { key: index },
+                        _react2.default.createElement('img', { src: props.img_url + item.relative_path, 'data-filename': item.file_name, onClick: phoneViewer })
+                    );
+                })
+            )
+        )
+    );
+}
+
+function FileList(props) {
+    function fileViewer(event) {
+        // 文件查看器调用app方法
+        var target = event.target;
+        var obj = { url: target.getAttribute('data-url'), fileName: target.getAttribute('data-filename') };
+        _tool2.default.forAndroid('openFile', JSON.stringify(obj));
+        _tool2.default.forIos('showAttachment', obj);
+    }
+    return props.value !== '' && _react2.default.createElement(
+        'div',
+        { className: 'wf-line show-file' },
+        _react2.default.createElement(
+            'div',
+            { className: 'form-title' },
+            props.title
+        ),
+        _react2.default.createElement(
+            'div',
+            { className: 'form-main' },
+            _react2.default.createElement(
+                'ul',
+                null,
+                JSON.parse(props.value).map(function (item, index) {
+                    return _react2.default.createElement(
+                        'li',
+                        { key: index },
+                        _react2.default.createElement('img', { src: './style/icon-' + _tool2.default.calc_file_type(item.file_name) + '.png', height: '44', width: '44' }),
+                        _react2.default.createElement(
+                            'button',
+                            { type: 'button', className: 'file-name',
+                                'data-filename': item.file_name,
+                                'data-url': props.file_url + item.relative_path,
+                                onClick: fileViewer },
+                            item.file_name
+                        )
+                    );
+                })
+            )
+        )
     );
 }
 
@@ -18842,9 +18574,10 @@ var WorkFlowDetail = function (_React$Component) {
         var _this = _possibleConstructorReturn(this, (WorkFlowDetail.__proto__ || Object.getPrototypeOf(WorkFlowDetail)).call(this, props));
 
         _this.state = {
-            formInfo: {}
+            workFlowInfo: null, // 工作流信息
+            is_error: false,
+            err_msg: ''
         };
-        _this.handleSubmit = _this.handleSubmit.bind(_this);
         return _this;
     }
 
@@ -18853,51 +18586,102 @@ var WorkFlowDetail = function (_React$Component) {
         value: function componentDidMount() {
             var _this2 = this;
 
-            var data = {
+            var submit_data = {
                 method: 'POST',
                 body: JSON.stringify({
-                    userId: _tool2.default.getUrlParam('userId') || 96,
-                    flowId: _tool2.default.getUrlParam('flowId') || 2,
-                    flowEntityId: _tool2.default.getUrlParam('flowEntityId') || 1320
+                    userId: _tool2.default.getUrlParam('userId'),
+                    flowId: _tool2.default.getUrlParam('flowId'),
+                    flowEntityId: _tool2.default.getUrlParam('flowEntityId')
                 })
                 // 获取后台数据
-            };fetch(API_ROOT + '/api/processInstance/getFlowDetailH5', data).then(function (response) {
+            };fetch(API_ROOT + '/api/processInstance/getFlowDetailH5', submit_data).then(function (response) {
                 if (response.ok) {
                     return response.json();
                 }
             }).then(function (data) {
-                _this2.setState({
-                    formInfo: data
-                });
+                console.log(data);
+                if (data.data) {
+                    _this2.setState({
+                        workFlowInfo: data
+                    });
+                } else {
+                    // 渲染错误信息
+                    _this2.setState({
+                        is_error: true,
+                        err_msg: data.message
+                    });
+                }
             }).catch(function (error) {
                 console.log(error);
             });
         }
     }, {
-        key: 'handleSubmit',
-        value: function handleSubmit() {}
-    }, {
         key: 'render',
         value: function render() {
-            return _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(ApplyLists, { data: this.state.formInfo.data }),
-                _react2.default.createElement(_render_approved2.default, null),
-                _react2.default.createElement(
+            if (this.state.workFlowInfo) {
+                var data = this.state.workFlowInfo.data;
+                return _react2.default.createElement(
                     'div',
-                    { className: 'btn-area' },
+                    null,
                     _react2.default.createElement(
+                        'ul',
+                        { className: 'apply-list' },
+                        _react2.default.createElement(ListItem, { title: '\u6D41\u7A0B\u540D\u79F0', value: data.flowName }),
+                        _react2.default.createElement(ListItem, { title: '\u6D41\u7A0B\u7F16\u53F7', value: data.flowNo }),
+                        _react2.default.createElement(ListItem, { title: '\u7533\u8BF7\u4EBA', value: data.user.name }),
+                        _react2.default.createElement(ListItem, { title: '\u5DE5\u53F7', value: data.user.sn }),
+                        _react2.default.createElement(ListItem, { title: '\u6240\u5C5E\u90E8\u95E8', value: data.user.department }),
+                        data.tableData.map(function (item, index) {
+                            if (item.type != 'hidden' && item.type != 'input_img' && item.type != 'input_accessory' && item.type != 'radio' && item.type != 'select') {
+                                return _react2.default.createElement(ListItem, { title: item.title, value: item.value, key: index });
+                            }
+                            if (item.type == 'radio' || item.type == 'select') {
+                                return _react2.default.createElement(ListItem, { title: item.title, value: item.options.filter(function (val) {
+                                        return val.checked;
+                                    })[0].name, key: index });
+                            }
+                            if (item.type == 'input_img') {
+                                return _react2.default.createElement(ImgList, { title: item.title, value: item.value, img_url: data.img_url, key: index });
+                            }
+                            if (item.type == 'input_accessory') {
+                                return _react2.default.createElement(FileList, { title: item.title, value: item.value, file_url: data.img_url, key: index });
+                            }
+                        })
+                    ),
+                    data.handleStatus !== '0' && _react2.default.createElement(
                         'div',
-                        { className: 'inner' },
+                        { className: 'current_task' },
                         _react2.default.createElement(
-                            'a',
-                            { href: 'javascript:void(0);', className: 'submit', onClick: this.handleSubmit },
-                            '\u63D0\u4EA4'
+                            'span',
+                            { className: 'title' },
+                            data.isEnd ? '审批结果' : '当前环节'
+                        ),
+                        _react2.default.createElement(
+                            'span',
+                            { className: 'used_show' },
+                            data.currentTaskName
+                        )
+                    ),
+                    data.flowApprover && _react2.default.createElement(
+                        'div',
+                        { className: 'current_spr' },
+                        _react2.default.createElement(
+                            'span',
+                            { className: 'title' },
+                            '\u5BA1\u6279\u4EBA\u5458'
+                        ),
+                        _react2.default.createElement(
+                            'span',
+                            { className: 'used_show' },
+                            data.flowApprover
                         )
                     )
-                )
-            );
+                );
+            }
+            if (this.state.is_error) {
+                return _react2.default.createElement(_noitem2.default, { message: this.state.err_msg });
+            }
+            return null;
         }
     }]);
 

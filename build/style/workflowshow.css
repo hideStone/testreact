@@ -2,18 +2,14 @@
 	position: relative;
 	background: #f3f3f3;
 	min-height: 100vh;
-	padding-bottom:65px;
 }
 .apply-list{
 	margin-bottom:10px;
 }
-.apply-list li{
+.apply-list>li{
 	display: flex;
-	/* // align-items:center;
-	// min-height: 28px; */
 	background: #fff;
 	padding:5px 15px;
-	/* // line-height: 28px; */
 }
 .apply-list li span.title{
 	color:#999;
@@ -46,36 +42,17 @@
     transform: scaleY(0.5);
 }
 .wf-line .form-title{
-	color:#404040;
+	color:#999;
 	width:56px;
 	line-height: 20px;
-	margin-right:15px;
+	margin-right:10px;
 }
 .wf-line .form-main{
 	flex:1;
 }
-.type-radio .form-main span{
-	line-height: 16px;
-}
-.type-radio .form-main span:not(:last-child){
-	margin-right:36px;
-}
-.type-radio .form-main input[type="radio"]{
-	display: none;
-}
-.type-radio .form-main input[type="radio"] + label{
-	padding-left:22px;
-	color:#999;
-	background:url('./icon-unselect.png') no-repeat left center;
-	background-size:15px 15px;
-}
-.type-radio .form-main input[type="radio"]:checked + label{
-	background:url('./icon-select.png') no-repeat left center;
-	background-size:15px 15px;
-}
 .type-texearea{
 	align-items: flex-start;
-	margin-bottom:10px;
+	margin:10px 0;
 }
 .type-texearea .form-main{
 	flex:1;
@@ -91,9 +68,9 @@
 }
 .show-pic,.show-file{
 	align-items: flex-start;
+	margin-bottom:10px;
 }
 .show-pic ul{
-	// display: flex;
 	overflow: hidden;
 }
 .show-pic ul li{
@@ -121,11 +98,17 @@
 }
 .show-file ul li .file-name{
 	color:#404040;
+	width:150px;
+	text-align: left;
+	overflow: hidden;
+	line-height: 1.2;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size:14px;	
 }
 .show-file ul li img{
 	height: 22px;
 	width:22px;
-	// vertical-align: middle;
 	margin-right: 10px;
 }
 .btn-area{
@@ -149,4 +132,19 @@
 .btn-area .inner a.submit{
 	background:#4ed795;
 	box-shadow:0 2px 4px 0 #d0d0d0;
+}
+.current_spr,.current_task{
+	display: flex;
+	background:#fff;
+	padding: 5px 15px;
+}
+.current_spr span.title,.current_task span.title{
+	color: #404040;
+    width: 56px;
+    margin-right: 15px;
+    line-height: 20px;
+}
+.current_spr span.used_show, .current_task span.used_show{
+	color: #404040;
+    line-height: 20px;
 }
