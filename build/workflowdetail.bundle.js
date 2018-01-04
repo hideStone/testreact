@@ -444,6 +444,9 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var tool = {
 	fetchData: function fetchData(url, data, cb) {
 		var _this = this;
@@ -548,34 +551,16 @@ var tool = {
 				break;
 		}
 	},
-	makeUpData: function makeUpData(data) {
-		var initData = data;
+	makeUpData: function makeUpData(formDom) {
+		var inputLists = formDom.querySelectorAll('input,textarea,radio'); // ?如遇到更多表单类型可能出bug
 		var tempObj = {};
-		var _iteratorNormalCompletion = true;
-		var _didIteratorError = false;
-		var _iteratorError = undefined;
 
-		try {
-			for (var _iterator = initData.entries()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-				var entrie = _step.value;
+		var _arr = [].concat(_toConsumableArray(inputLists));
 
-				tempObj[entrie[0]] = entrie[1];
-			}
-		} catch (err) {
-			_didIteratorError = true;
-			_iteratorError = err;
-		} finally {
-			try {
-				if (!_iteratorNormalCompletion && _iterator.return) {
-					_iterator.return();
-				}
-			} finally {
-				if (_didIteratorError) {
-					throw _iteratorError;
-				}
-			}
+		for (var _i = 0; _i < _arr.length; _i++) {
+			var info = _arr[_i];
+			tempObj[info.name] = info.value;
 		}
-
 		return tempObj;
 	}
 };

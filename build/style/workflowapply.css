@@ -128,18 +128,18 @@ span.is_selected,span.used_show{
 	padding:12px 15px;
 	display: flex;
 }
-.btn-area .inner button{
+.btn-area .inner a{
 	flex:1;
 	line-height: 40px;
 	color:#fff;
 	text-align: center;
 	border-radius: 3px;
 }
-.btn-area .inner button.submit{
+.btn-area .inner a.submit{
 	background:#4ed795;
 	box-shadow:0 2px 4px 0 #d0d0d0;
 }
-.btn-area .inner button.save{
+.btn-area .inner a.save{
 	background:#feb413;
 	box-shadow:0 2px 4px 0 #d0d0d0;
 	margin-left:15px;

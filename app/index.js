@@ -35,8 +35,8 @@ class ApplyWorkFlow extends React.Component {
 	}
 	componentDidMount() {
 		const submit_data = {
-			userId: Tool.getUrlParam('userId'),
-			flowId: Tool.getUrlParam('flowId'),
+			userId: Tool.getUrlParam('userId') || 98,
+			flowId: Tool.getUrlParam('flowId') || 2,
 			flowEntityId: Tool.getUrlParam('flowEntityId')
 		}
 		const data = {
@@ -70,26 +70,23 @@ class ApplyWorkFlow extends React.Component {
 		})
 	}
 	handleSave() { // 保存工作流
-		const form = new FormData(this.refs.workflow)
 		const data = {
 			method: 'POST',
-			body: JSON.stringify(Tool.makeUpData(form))
+			body: JSON.stringify(Tool.makeUpData(this.refs.workflow))  // $(this.refs.workflow).serializeObect()
 		}
-		Tool.fetchData(`${API_ROOT}/api/processInstance/saveUserProcessForm`, data)
+		Tool.fetchData( API_ROOT + '/api/processInstance/saveUserProcessForm', data)
 	}
 	handleSubmit() { // 提交工作流
-		const form = new FormData(this.refs.workflow)
 		const data = {
 			method: 'POST',
-			body: JSON.stringify(Tool.makeUpData(form))
+			body: JSON.stringify(Tool.makeUpData(this.refs.workflow))
 		}
 		Tool.fetchData(`${API_ROOT}/api/processInstance/saveFormAndStartProcess`, data)
 	}
 	saveApprove() { // 保存审核
-		const form = new FormData(this.refs.workflow)
 		const data = {
 			method: 'POST',
-			body: JSON.stringify(Tool.makeUpData(form))
+			body: JSON.stringify(Tool.makeUpData(this.refs.workflow))
 		}
 		Tool.fetchData(`${API_ROOT}/api/processInstance/submitApproveAndForm`, data)		
 	}

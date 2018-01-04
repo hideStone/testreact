@@ -96,11 +96,11 @@ const tool = {
 				break;
 		}
 	},
-	makeUpData(data) {
-		const initData = data
+	makeUpData(formDom) {
+		const inputLists = formDom.querySelectorAll('input,textarea,radio') // ?如遇到更多表单类型可能出bug
 		const tempObj = {}
-		for(let entrie of initData.entries()) {
-			tempObj[entrie[0]] = entrie[1]
+		for(let info of [...inputLists]) {
+			tempObj[info.name] = info.value
 		}
 		return tempObj
 	}

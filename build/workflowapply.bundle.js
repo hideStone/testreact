@@ -444,6 +444,9 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var tool = {
 	fetchData: function fetchData(url, data, cb) {
 		var _this = this;
@@ -548,34 +551,16 @@ var tool = {
 				break;
 		}
 	},
-	makeUpData: function makeUpData(data) {
-		var initData = data;
+	makeUpData: function makeUpData(formDom) {
+		var inputLists = formDom.querySelectorAll('input,textarea,radio'); // ?如遇到更多表单类型可能出bug
 		var tempObj = {};
-		var _iteratorNormalCompletion = true;
-		var _didIteratorError = false;
-		var _iteratorError = undefined;
 
-		try {
-			for (var _iterator = initData.entries()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-				var entrie = _step.value;
+		var _arr = [].concat(_toConsumableArray(inputLists));
 
-				tempObj[entrie[0]] = entrie[1];
-			}
-		} catch (err) {
-			_didIteratorError = true;
-			_iteratorError = err;
-		} finally {
-			try {
-				if (!_iteratorNormalCompletion && _iterator.return) {
-					_iterator.return();
-				}
-			} finally {
-				if (_didIteratorError) {
-					throw _iteratorError;
-				}
-			}
+		for (var _i = 0; _i < _arr.length; _i++) {
+			var info = _arr[_i];
+			tempObj[info.name] = info.value;
 		}
-
 		return tempObj;
 	}
 };
@@ -18466,8 +18451,8 @@ var Button = function (_React$Component) {
         key: "render",
         value: function render() {
             return _react2.default.createElement(
-                "button",
-                { type: "button",
+                "a",
+                { href: "javascript:void(0);",
                     className: this.props.class_name,
                     onClick: this.props.onClick },
                 this.props.button_text
@@ -19691,8 +19676,8 @@ var ApplyWorkFlow = function (_React$Component) {
 			var _this2 = this;
 
 			var submit_data = {
-				userId: _tool2.default.getUrlParam('userId'),
-				flowId: _tool2.default.getUrlParam('flowId'),
+				userId: _tool2.default.getUrlParam('userId') || 98,
+				flowId: _tool2.default.getUrlParam('flowId') || 2,
 				flowEntityId: _tool2.default.getUrlParam('flowEntityId')
 			};
 			var data = {
@@ -19729,10 +19714,9 @@ var ApplyWorkFlow = function (_React$Component) {
 		key: 'handleSave',
 		value: function handleSave() {
 			// 保存工作流
-			var form = new FormData(this.refs.workflow);
 			var data = {
 				method: 'POST',
-				body: JSON.stringify(_tool2.default.makeUpData(form))
+				body: JSON.stringify(_tool2.default.makeUpData(this.refs.workflow)) // $(this.refs.workflow).serializeObect()
 			};
 			_tool2.default.fetchData(API_ROOT + '/api/processInstance/saveUserProcessForm', data);
 		}
@@ -19740,10 +19724,9 @@ var ApplyWorkFlow = function (_React$Component) {
 		key: 'handleSubmit',
 		value: function handleSubmit() {
 			// 提交工作流
-			var form = new FormData(this.refs.workflow);
 			var data = {
 				method: 'POST',
-				body: JSON.stringify(_tool2.default.makeUpData(form))
+				body: JSON.stringify(_tool2.default.makeUpData(this.refs.workflow))
 			};
 			_tool2.default.fetchData(API_ROOT + '/api/processInstance/saveFormAndStartProcess', data);
 		}
@@ -19751,10 +19734,9 @@ var ApplyWorkFlow = function (_React$Component) {
 		key: 'saveApprove',
 		value: function saveApprove() {
 			// 保存审核
-			var form = new FormData(this.refs.workflow);
 			var data = {
 				method: 'POST',
-				body: JSON.stringify(_tool2.default.makeUpData(form))
+				body: JSON.stringify(_tool2.default.makeUpData(this.refs.workflow))
 			};
 			_tool2.default.fetchData(API_ROOT + '/api/processInstance/submitApproveAndForm', data);
 		}

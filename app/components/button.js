@@ -10,9 +10,9 @@ class Button extends React.Component{
 
     render() {
         return (
-            <button type="button" 
+            <a href="javascript:void(0);" 
             className={this.props.class_name}
-            onClick={this.props.onClick}>{this.props.button_text}</button>
+            onClick={this.props.onClick}>{this.props.button_text}</a>
         )
     }
 }
